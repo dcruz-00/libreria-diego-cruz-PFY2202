@@ -3,6 +3,7 @@ import { obtenerCategorias } from '../api/categorias.js'
 import Cargando from '../components/Cargando.jsx'
 import MensajeError from '../components/MensajeError.jsx'
 import { useConsulta } from '../hooks/useConsulta.js'
+import { pluralizar } from '../utils/formato.js'
 
 // Página /categorias: pide el listado a GET /api/categorias.
 function ListadoCategorias() {
@@ -33,7 +34,7 @@ function ListadoCategorias() {
               >
                 <h2 className="text-lg font-semibold text-primario">{categoria.nombre}</h2>
                 <p className="mt-1 text-sm text-texto-suave">{categoria.descripcion}</p>
-                <p className="mt-3 text-sm font-semibold">{categoria.cantidadLibros} libros</p>
+                <p className="mt-3 text-sm font-semibold">{pluralizar(categoria.cantidadLibros, 'libro', 'libros')}</p>
               </Link>
             </li>
           ))}
