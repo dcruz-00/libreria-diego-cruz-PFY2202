@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Colores propios del sitio. Cada variable --color-X crea clases como bg-X, text-X y border-X. */
+@theme {
+  --color-fondo: #f7f4ef;
+  --color-superficie: #ffffff;
+  --color-texto: #2b2622;
+  --color-texto-suave: #6b625a;
+  --color-borde: #e2dcd3;
+  --color-primario: #7a3e1d;
+  --color-error: #b42318;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+  }
+}
