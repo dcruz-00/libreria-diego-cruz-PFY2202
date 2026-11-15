@@ -1,5 +1,8 @@
 import { Link, useParams } from 'react-router'
 import { obtenerCategoria } from '../api/categorias.js'
+import Cargando from '../components/Cargando.jsx'
+import EstadoVacio from '../components/EstadoVacio.jsx'
+import MensajeError from '../components/MensajeError.jsx'
 import { useConsulta } from '../hooks/useConsulta.js'
 import { formatearPrecio } from '../utils/formato.js'
 
@@ -18,13 +21,14 @@ function DetalleCategoria() {
         ← Volver a categorías
       </Link>
 
-      {/* Provisorio: en el paso 7 estos dos bloques pasan a ser componentes reutilizables. */}
-      {cargando && <p className="mt-4">Cargando libros…</p>}
+      {cargando && <Cargando mensaje="Cargando libros…" />}
+
       {error && (
-        <div className="mt-4">
-          <p className="text-error">{error.message}</p>
-          {error.reintentable && <button type="button" onClick={reintentar}>Reintentar</button>}
-        </div>
+        <MensajeError
+          error={error}
+          onReintentar={reintentar}
+          alternativa={{ to: '/categorias', texto: 'Ver las categorías disponibles' }}
+        />
       )}
 
       {categoria && (
@@ -33,7 +37,11 @@ function DetalleCategoria() {
           <p className="mb-6 text-texto-suave">{categoria.descripcion}</p>
 
           {categoria.libros.length === 0 ? (
-            <p>Esta categoría todavía no tiene libros.</p>
+            <EstadoVacio mensaje="Esta categoría todavía no tiene libros.">
+              <Link to="/categorias" className="font-semibold text-primario underline">
+                Explorar otras categorías
+              </Link>
+            </EstadoVacio>
           ) : (
             <ul className="grid gap-4 sm:grid-cols-2">
               {categoria.libros.map((libro) => (

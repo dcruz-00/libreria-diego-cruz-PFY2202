@@ -1,5 +1,7 @@
 import { Link } from 'react-router'
 import { obtenerCategorias } from '../api/categorias.js'
+import Cargando from '../components/Cargando.jsx'
+import MensajeError from '../components/MensajeError.jsx'
 import { useConsulta } from '../hooks/useConsulta.js'
 
 // Página /categorias: pide el listado a GET /api/categorias.
@@ -11,13 +13,14 @@ function ListadoCategorias() {
       <h1 className="mb-2 text-2xl font-bold">Categorías</h1>
       <p className="mb-6 text-texto-suave">Elige una categoría para ver sus libros.</p>
 
-      {/* Provisorio: en el paso 7 estos dos bloques pasan a ser componentes reutilizables. */}
-      {cargando && <p>Cargando categorías…</p>}
+      {cargando && <Cargando mensaje="Cargando categorías…" />}
+
       {error && (
-        <div>
-          <p className="text-error">{error.message}</p>
-          {error.reintentable && <button type="button" onClick={reintentar}>Reintentar</button>}
-        </div>
+        <MensajeError
+          error={error}
+          onReintentar={reintentar}
+          alternativa={{ to: '/', texto: 'Volver al inicio' }}
+        />
       )}
 
       {categorias && (
