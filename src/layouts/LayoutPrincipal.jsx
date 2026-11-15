@@ -18,6 +18,8 @@ function LayoutPrincipal() {
         <ul className="mx-auto flex max-w-240 gap-2">
           {/* end: "/" solo queda activo en la portada, no en todas las rutas que empiezan con "/" */}
           <li><NavLink to="/" end className={claseEnlace}>Inicio</NavLink></li>
+           {/* Sin end: también queda activo en /categorias/:id */}
+          <li><NavLink to="/categorias" className={claseEnlace}>Categorías</NavLink></li>
         </ul>
       </nav>
 
