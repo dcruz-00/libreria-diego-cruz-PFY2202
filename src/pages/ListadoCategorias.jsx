@@ -1,9 +1,41 @@
-// Página /categorias. En el paso 6 pedirá el listado a GET /api/categorias.
+import { Link } from 'react-router'
+import { obtenerCategorias } from '../api/categorias.js'
+import { useConsulta } from '../hooks/useConsulta.js'
+
+// Página /categorias: pide el listado a GET /api/categorias.
 function ListadoCategorias() {
+  const { datos: categorias, error, cargando, reintentar } = useConsulta('categorias', obtenerCategorias)
+
   return (
     <section>
       <h1 className="mb-2 text-2xl font-bold">Categorías</h1>
-      <p className="text-texto-suave">Elige una categoría para ver sus libros.</p>
+      <p className="mb-6 text-texto-suave">Elige una categoría para ver sus libros.</p>
+
+      {/* Provisorio: en el paso 7 estos dos bloques pasan a ser componentes reutilizables. */}
+      {cargando && <p>Cargando categorías…</p>}
+      {error && (
+        <div>
+          <p className="text-error">{error.message}</p>
+          {error.reintentable && <button type="button" onClick={reintentar}>Reintentar</button>}
+        </div>
+      )}
+
+      {categorias && (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {categorias.map((categoria) => (
+            <li key={categoria.id}>
+              <Link
+                to={categoria.id}
+                className="block h-full rounded-lg border border-borde bg-superficie p-4 hover:border-primario"
+              >
+                <h2 className="text-lg font-semibold text-primario">{categoria.nombre}</h2>
+                <p className="mt-1 text-sm text-texto-suave">{categoria.descripcion}</p>
+                <p className="mt-3 text-sm font-semibold">{categoria.cantidadLibros} libros</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }
