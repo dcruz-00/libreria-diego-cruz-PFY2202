@@ -5,8 +5,22 @@ import { categorias, libros } from './datos.js'
 // Latencia simulada, para que el indicador de carga alcance a verse.
 const LATENCIA_MS = 1000
 
-// "Historia" falla una vez sí y otra no, para probar el error 500 y el botón "Reintentar".
+// "Historia" falla un intento sí y otro no, para probar el error 500 y el botón "Reintentar".
+// En desarrollo, StrictMode envía dos peticiones casi juntas (la primera se cancela en el
+// navegador, pero igual llega aquí). Las que llegan con menos de VENTANA_MS de diferencia
+// cuentan como un mismo intento; si no, la petición descartada "gastaría" el error.
+const VENTANA_MS = 300
 let intentosHistoria = 0
+let ultimaPeticionHistoria = 0
+
+function historiaDebeFallar() {
+  const ahora = Date.now()
+  if (ahora - ultimaPeticionHistoria > VENTANA_MS) {
+    intentosHistoria++
+  }
+  ultimaPeticionHistoria = ahora
+  return intentosHistoria % 2 === 1
+}
 
 // Cada handler atiende un método + una ruta. MSW usa el primero que coincide,
 // así que el orden importa: el comodín /api/* va al final.
@@ -25,6 +39,9 @@ export const handlers = [
 
   // GET /api/categorias/:id → una categoría con sus libros. ":id" es un parámetro de ruta.
   http.get('/api/categorias/:id', async ({ params }) => {
+    // Se decide al llegar la petición (antes de la espera), para agrupar bien los duplicados.
+    const debeFallar = params.id === 'historia' && historiaDebeFallar()
+
     await delay(LATENCIA_MS)
 
     const categoria = categorias.find((c) => c.id === params.id)
@@ -36,14 +53,11 @@ export const handlers = [
       )
     }
 
-    if (categoria.id === 'historia') {
-      intentosHistoria++
-      if (intentosHistoria % 2 === 1) {
-        return HttpResponse.json(
-          { mensaje: 'Error interno del servidor.' },
-          { status: 500 },
-        )
-      }
+    if (debeFallar) {
+      return HttpResponse.json(
+        { mensaje: 'Error interno del servidor.' },
+        { status: 500 },
+      )
     }
 
     return HttpResponse.json({
